@@ -1,0 +1,174 @@
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+//   url      = env("DATABASE_URL")
+}
+
+// User
+model User {
+  id            String        @id @default(cuid())
+  email         String        @unique
+  password      String?
+  name          String?
+  image         String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  progress      Progress[]
+  quizAttempts  QuizAttempt[]
+}
+
+// Level
+model Level {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  title       String
+  description String
+  order       Int       @unique
+  color       String    @default("#667eea")
+  topics      Topic[]
+  createdAt   DateTime  @default(now())
+}
+
+// Topic
+model Topic {
+  id              String        @id @default(cuid())
+  title           String
+  description     String
+  content         String?       @db.Text
+  levelId         String
+  level           Level         @relation(fields: [levelId], references: [id])
+  order           Int
+  isLocked        Boolean       @default(false)
+  requiredTopicId String?
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+  
+  grammarRules    GrammarRule[]
+  examples        Example[]
+  quizzes         Quiz[]
+  progress        Progress[]
+  memoryAid       MemoryAid?
+  vocabulary      VocabularyWord[]
+}
+
+// Grammar Rule
+model GrammarRule {
+  id          String    @id @default(cuid())
+  title       String
+  explanation String    @db.Text
+  rules       String    @db.Text
+  topicId     String
+  topic       Topic     @relation(fields: [topicId], references: [id])
+  examples    Example[]
+}
+
+// Example
+model Example {
+  id          String    @id @default(cuid())
+  finnish     String
+  english     String
+  explanation String?   @db.Text
+  topicId     String?
+  topic       Topic?    @relation(fields: [topicId], references: [id])
+  grammarRuleId String?
+  grammarRule GrammarRule? @relation(fields: [grammarRuleId], references: [id])
+}
+
+// Memory Aid
+model MemoryAid {
+  id          String    @id @default(cuid())
+  topicId     String    @unique
+  topic       Topic     @relation(fields: [topicId], references: [id])
+  mnemonic    String    @db.Text
+  explanation String    @db.Text
+  quickTips   String    @db.Text
+  colorCode   String    @default("#667eea")
+  icon        String    @default("💡")
+  examples    String?   @db.Text
+  createdAt   DateTime  @default(now())
+}
+
+// Vocabulary Word
+model VocabularyWord {
+  id          String    @id @default(cuid())
+  finnish     String
+  english     String
+  partOfSpeech String
+  level       String
+  topicId     String
+  topic       Topic     @relation(fields: [topicId], references: [id])
+  memoryTip   String?   @db.Text
+  exampleSentence String?
+  exampleTranslation String?
+  createdAt   DateTime  @default(now())
+}
+
+// Quiz
+model Quiz {
+  id           String      @id @default(cuid())
+  title        String
+  description  String?     @db.Text
+  topicId      String
+  topic        Topic       @relation(fields: [topicId], references: [id])
+  questions    Question[]
+  attempts     QuizAttempt[]
+  timeLimit    Int?
+  passingScore Int         @default(70)
+  isDynamic    Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+}
+
+// Question
+model Question {
+  id            String      @id @default(cuid())
+  text          String      @db.Text
+  type          QuestionType
+  options       String?     @db.Text
+  correctAnswer String      @db.Text
+  explanation   String?     @db.Text
+  points        Int         @default(1)
+  quizId        String
+  quiz          Quiz        @relation(fields: [quizId], references: [id])
+  order         Int
+}
+
+// Quiz Attempt
+model QuizAttempt {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  quizId      String
+  quiz        Quiz      @relation(fields: [quizId], references: [id])
+  score       Int
+  answers     String    @db.Text
+  completedAt DateTime  @default(now())
+  timeSpent   Int?
+}
+
+// Progress
+model Progress {
+  id                String    @id @default(cuid())
+  userId            String
+  user              User      @relation(fields: [userId], references: [id])
+  topicId           String
+  topic             Topic     @relation(fields: [topicId], references: [id])
+  completed         Boolean   @default(false)
+  quizScore         Int?
+  grammarViewed     Boolean   @default(false)
+  examplesViewed    Boolean   @default(false)
+  practiceCompleted Boolean   @default(false)
+  quizCompleted     Boolean   @default(false)
+  lastAccessed      DateTime  @default(now())
+  completedAt       DateTime?
+}
+
+enum QuestionType {
+  MULTIPLE_CHOICE
+  FILL_BLANK
+  TRANSLATION
+  TRUE_FALSE
+}
