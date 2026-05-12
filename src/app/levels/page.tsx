@@ -207,6 +207,25 @@ const levelColors: Record<string, string> = {
   C2: "#ed64a6",
 };
 
+interface UserProgress {
+  completed: boolean;
+  grammarViewed: boolean;
+  examplesViewed: boolean;
+  practiceCompleted: boolean;
+  quizCompleted: boolean;
+  quizScore: number | null;
+}
+
+interface Topic {
+  id: string;
+  title: string;
+  description: string;
+  order: number;
+  userProgress: UserProgress | null;
+  grammarRules: unknown[];
+  quizzes: unknown[];
+}
+
 interface Level {
   id: string;
   name: string;
@@ -218,23 +237,6 @@ interface Level {
   completedTopics: number;
   totalTopics: number;
   topics: Topic[];
-}
-
-interface Topic {
-  id: string;
-  title: string;
-  description: string;
-  order: number;
-  progress?: Array<{
-    completed: boolean;
-    grammarViewed: boolean;
-    examplesViewed: boolean;
-    practiceCompleted: boolean;
-    quizCompleted: boolean;
-    quizScore: number | null;
-  }>;
-  grammarRules: unknown[];
-  quizzes: unknown[];
 }
 
 function LevelsContent() {
@@ -256,36 +258,88 @@ function LevelsContent() {
   }, [status, router]);
 
   useEffect(() => {
+    if (!session) return;
+
+    let isMounted = true;
+
     const fetchLevels = async () => {
       try {
-        const response = await fetch("/api/levels");
+        const response = await fetch("/api/levels", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
         const data = await response.json();
-        setLevels(data);
 
-        if (
-          selectedLevel &&
-          data.find((l: Level) => l.name === selectedLevel)
-        ) {
-          setExpandedLevel(selectedLevel);
+        if (isMounted) {
+          setLevels(data);
+          setLoading(false);
         }
       } catch (error) {
         console.error("Failed to fetch levels:", error);
-      } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     };
 
-    if (session) {
-      fetchLevels();
-    }
-  }, [session, selectedLevel]);
+    fetchLevels();
+
+    return () => {
+      isMounted = false;
+    };
+  }, [session]);
+
+  useEffect(() => {
+    if (!session) return;
+
+    let isMounted = true;
+
+    const refreshLevels = async () => {
+      try {
+        const response = await fetch("/api/levels", {
+          cache: "no-store",
+          headers: {
+            "Cache-Control": "no-cache",
+          },
+        });
+        const data = await response.json();
+
+        if (isMounted) {
+          setLevels(data);
+        }
+      } catch (error) {
+        console.error("Failed to refresh levels:", error);
+      }
+    };
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        refreshLevels();
+      }
+    };
+
+    const handleFocus = () => {
+      refreshLevels();
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("focus", handleFocus);
+
+    return () => {
+      isMounted = false;
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("focus", handleFocus);
+    };
+  }, [session]);
 
   const getTopicProgress = (topic: Topic) => {
-    if (!topic.progress || topic.progress.length === 0) {
+    const progress = topic.userProgress;
+
+    if (!progress) {
       return { status: "not-started", percentage: 0 };
     }
-
-    const progress = topic.progress[0];
 
     if (progress.completed) {
       return { status: "completed", percentage: 100 };
@@ -308,8 +362,7 @@ function LevelsContent() {
   const isTopicLocked = (topics: Topic[], currentIndex: number) => {
     if (currentIndex === 0) return false;
     const previousTopic = topics[currentIndex - 1];
-    const previousProgress = previousTopic.progress?.[0];
-    return !previousProgress?.completed;
+    return !previousTopic.userProgress?.completed;
   };
 
   const handleTopicClick = (topic: Topic, isLocked: boolean) => {
