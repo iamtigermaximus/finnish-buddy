@@ -1,41 +1,18 @@
 import { MetadataRoute } from 'next'
-import { prisma } from '@/lib/db/prisma'
+
+export const dynamic = 'force-dynamic'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = 'https://finnishbuddy.vercel.app'
-  
-  const topics = await prisma.topic.findMany({
-    include: { level: true }
-  })
-  
-  const topicUrls = topics.map((topic) => ({
-    url: `${baseUrl}/topics/${topic.id}`,
-    lastModified: topic.updatedAt,
-    changeFrequency: 'weekly' as const,
-    priority: 0.7,
-  }))
-  
-  const levelUrls = ['A1', 'A2', 'B1', 'B2', 'C1', 'C2'].map((level) => ({
-    url: `${baseUrl}/levels?level=${level}`,
-    lastModified: new Date(),
-    changeFrequency: 'weekly' as const,
-    priority: 0.8,
-  }))
+  const baseUrl = process.env.NEXTAUTH_URL || 'https://finnishbuddy.vercel.app'
   
   return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/levels`,
-      lastModified: new Date(),
-      changeFrequency: 'daily',
-      priority: 0.9,
-    },
-    ...levelUrls,
-    ...topicUrls,
+    { url: baseUrl, lastModified: new Date(), changeFrequency: 'daily', priority: 1 },
+    { url: `${baseUrl}/levels`, lastModified: new Date(), changeFrequency: 'daily', priority: 0.9 },
+    { url: `${baseUrl}/levels?level=A1`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/levels?level=A2`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/levels?level=B1`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/levels?level=B2`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/levels?level=C1`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
+    { url: `${baseUrl}/levels?level=C2`, lastModified: new Date(), changeFrequency: 'weekly', priority: 0.8 },
   ]
 }
