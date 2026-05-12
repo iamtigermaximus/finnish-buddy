@@ -1,9 +1,11 @@
-// src/app/layout.tsx (updated with ThemeProvider)
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import StyledComponentsRegistry from "../lib/registry";
+import StyledComponentsRegistry from "@/lib/registry";
 import { Providers } from "./provider";
-import { ThemeProvider } from "../styles/ThemeProvider";
+import { ThemeProvider } from "@/styles/ThemeProvider";
+import ErrorBoundary from "@/components/ui/ErrorBoundary";
+import { ToastProvider } from "@/components/ui/ToastProvider";
+import "./global.css";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -21,11 +23,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <StyledComponentsRegistry>
-          <ThemeProvider>
-            <Providers>{children}</Providers>
-          </ThemeProvider>
-        </StyledComponentsRegistry>
+        <ErrorBoundary>
+          <StyledComponentsRegistry>
+            <ThemeProvider>
+              <Providers>
+                <ToastProvider>{children}</ToastProvider>
+              </Providers>
+            </ThemeProvider>
+          </StyledComponentsRegistry>
+        </ErrorBoundary>
       </body>
     </html>
   );
