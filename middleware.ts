@@ -4,27 +4,43 @@ import { NextResponse } from "next/server";
 
 export default withAuth(
   function middleware(req) {
-    // Allow access to protected routes only if authenticated
     return NextResponse.next();
   },
   {
     callbacks: {
-      authorized: ({ token }) => {
-        // User is authenticated if token exists
+      authorized: ({ token, req }) => {
+        const { pathname } = req.nextUrl;
+
+        // ✅ Allow public routes (no authentication required)
+        const publicPaths = ["/", "/login", "/register"];
+        if (publicPaths.includes(pathname)) {
+          return true;
+        }
+
+        // ✅ Allow static files and API routes
+        if (
+          pathname.startsWith("/api/auth") ||
+          pathname.startsWith("/_next") ||
+          pathname.includes(".")
+        ) {
+          return true;
+        }
+
+        // ✅ Require authentication for protected routes
         return !!token;
       },
     },
   },
 );
 
-// Routes that require authentication
+// ✅ Only protect specific routes, not everything
 export const config = {
   matcher: [
-    "/:path*",
     "/dashboard/:path*",
     "/levels/:path*",
     "/topics/:path*",
     "/quiz/:path*",
     "/profile/:path*",
+    "/progress/:path*",
   ],
 };
