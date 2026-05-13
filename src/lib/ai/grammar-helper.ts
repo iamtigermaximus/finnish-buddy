@@ -1,5 +1,5 @@
 // src/lib/ai/grammar-helper.ts
-import { callGroq } from "./groq-client";
+import { callDeepSeek } from "./deepseek-client";
 
 export async function explainGrammarWithAI(
   grammarRule: string,
@@ -23,7 +23,28 @@ As Otso the friendly bear, provide a warm, encouraging explanation that:
 
 Keep the response friendly but educational, around 200-300 words.`;
 
-  return await callGroq(prompt);
+  return await callDeepSeek(prompt);
+}
+
+// Fallback exercises when AI fails
+function getFallbackExercises(topicTitle: string) {
+  return [
+    {
+      prompt: `Practice using "${topicTitle}" in a sentence.`,
+      expectedAnswer: "Example answer",
+      hint: "Review the grammar rules and try again! 📚",
+    },
+    {
+      prompt: `Translate to Finnish: "I want to learn ${topicTitle}."`,
+      expectedAnswer: "Haluan oppia lisää",
+      hint: "Haluan = I want, oppia = to learn",
+    },
+    {
+      prompt: `Fill in the blank: "___ on tärkeää oppia ${topicTitle}." (It is important to learn ${topicTitle})`,
+      expectedAnswer: "Se",
+      hint: "Se means 'it' in Finnish",
+    },
+  ];
 }
 
 export async function generatePracticeExercises(
@@ -32,6 +53,15 @@ export async function generatePracticeExercises(
   level: string,
   numberOfExercises: number = 3,
 ): Promise<Array<{ prompt: string; expectedAnswer: string; hint: string }>> {
+  // Check if API key is available
+  if (
+    !process.env.DEEPSEEK_API_KEY ||
+    process.env.DEEPSEEK_API_KEY === "dummy_key_for_now"
+  ) {
+    console.log("No DeepSeek API key, using fallback exercises");
+    return getFallbackExercises(topicTitle);
+  }
+
   const prompt = `Create ${numberOfExercises} interactive practice exercises for ${level} level Finnish students learning "${topicTitle}".
 
 Grammar rules covered:
@@ -55,13 +85,16 @@ Return as JSON array:
 ]`;
 
   try {
-    const response = await callGroq(
+    const response = await callDeepSeek(
       prompt,
       "Return ONLY valid JSON array. No other text.",
     );
     const jsonMatch = response.match(/\[[\s\S]*\]/);
     if (jsonMatch) {
-      return JSON.parse(jsonMatch[0]);
+      const exercises = JSON.parse(jsonMatch[0]);
+      if (exercises && exercises.length > 0) {
+        return exercises;
+      }
     }
     return getFallbackExercises(topicTitle);
   } catch (error) {
@@ -70,20 +103,18 @@ Return as JSON array:
   }
 }
 
-function getFallbackExercises(topicTitle: string) {
-  return [
-    {
-      prompt: `Practice using "${topicTitle}" in a sentence.`,
-      expectedAnswer: "Example answer",
-      hint: "Review the grammar rules and try again! 📚",
-    },
-  ];
-}
-
 export async function getWordMemoryTip(
   finnishWord: string,
   englishMeaning: string,
 ): Promise<string> {
+  // Check if API key is available
+  if (
+    !process.env.DEEPSEEK_API_KEY ||
+    process.env.DEEPSEEK_API_KEY === "dummy_key_for_now"
+  ) {
+    return `🐻 Remember "${finnishWord}" means "${englishMeaning}"! Think of something fun to help you remember!`;
+  }
+
   const prompt = `Create a fun, memorable mnemonic or memory trick to remember the Finnish word "${finnishWord}" which means "${englishMeaning}".
 
 Make it:
@@ -99,7 +130,7 @@ Examples:
 Return ONLY the memory tip, nothing else.`;
 
   try {
-    return await callGroq(
+    return await callDeepSeek(
       prompt,
       "You are Otso the bear creating fun memory tricks. Be creative and helpful!",
     );
