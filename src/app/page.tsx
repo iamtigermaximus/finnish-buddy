@@ -6,7 +6,7 @@ import MainLayout from "@/components/layout/MainLayout";
 import Container from "@/components/layout/Container";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
-import Link from "next/link";
+import { useSession } from "next-auth/react";
 
 const HeroSection = styled.section`
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -144,6 +144,8 @@ const CTASubtitle = styled.p`
 `;
 
 export default function HomePage() {
+  const { data: session } = useSession();
+
   const levels = [
     {
       name: "A1",
@@ -228,8 +230,9 @@ export default function HomePage() {
             <br />
             and your friendly bear buddy, Otso!
           </HeroSubtitle>
-          <Button href="/register" size="large">
-            Start Learning Free 🐻
+          {/* Hero button changes based on login status */}
+          <Button href={session ? "/levels" : "/register"} size="large">
+            {session ? "Continue Learning 🐻" : "Start Learning Free 🐻"}
           </Button>
         </Container>
       </HeroSection>
@@ -257,8 +260,15 @@ export default function HomePage() {
               <LevelCardWrapper key={level.name} $color={level.color}>
                 <div className="level-name">{level.name}</div>
                 <div className="level-desc">{level.description}</div>
-                <Button href="/register" variant="secondary" size="small">
-                  Start {level.name} →
+                {/* Level buttons change based on login status */}
+                <Button
+                  href={session ? `/levels?level=${level.name}` : "/register"}
+                  variant="secondary"
+                  size="small"
+                >
+                  {session
+                    ? `Continue ${level.name} →`
+                    : `Start ${level.name} →`}
                 </Button>
               </LevelCardWrapper>
             ))}
@@ -273,8 +283,13 @@ export default function HomePage() {
             Join thousands of happy learners mastering Finnish with Otso the
             bear!
           </CTASubtitle>
-          <Button href="/register" variant="secondary" size="large">
-            Create Free Account 🐻
+          {/* CTA button changes based on login status */}
+          <Button
+            href={session ? "/levels" : "/register"}
+            variant="secondary"
+            size="large"
+          >
+            {session ? "Go to Dashboard 🐻" : "Create Free Account 🐻"}
           </Button>
         </Container>
       </CTASection>

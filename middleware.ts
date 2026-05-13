@@ -20,6 +20,7 @@ export default withAuth(
 // Routes that require authentication
 export const config = {
   matcher: [
+    "/:path*",
     "/dashboard/:path*",
     "/levels/:path*",
     "/topics/:path*",

@@ -4,9 +4,11 @@ import OpenAI from "openai";
 const deepseek = new OpenAI({
   apiKey: process.env.DEEPSEEK_API_KEY,
   baseURL: "https://api.deepseek.com",
+  timeout: 30000, // 30 second timeout
+  maxRetries: 2,
 });
 
-export const AI_MODEL = "deepseek-v4-pro"; // or "deepseek-reasoner" for reasoning tasks
+export const AI_MODEL = "deepseek-chat";
 
 export async function callDeepSeek(
   prompt: string,
@@ -18,22 +20,34 @@ export async function callDeepSeek(
   ) {
     console.log("No DEEPSEEK_API_KEY, using mock response");
     return JSON.stringify({
-      title: "Sample Quiz",
-      description: "This is a sample quiz",
-      passingScore: 70,
-      questions: [
+      grammarExplanation:
+        "This is a sample lesson. Add your DEEPSEEK_API_KEY to generate real content! 🐻",
+      grammarRules: [
+        "Rule 1",
+        "Rule 2",
+        "Rule 3",
+        "Rule 4",
+        "Rule 5",
+        "Rule 6",
+      ],
+      examples: [
+        { finnish: "Esimerkki", english: "Example", explanation: "Sample" },
+      ],
+      memoryAid: {
+        mnemonic: "Sample",
+        explanation: "Sample",
+        quickTips: ["Tip 1", "Tip 2", "Tip 3", "Tip 4"],
+      },
+      practiceExercises: [
+        { prompt: "Sample", expectedAnswer: "answer", hint: "hint" },
+      ],
+      quizQuestions: [
         {
-          text: "What is the best way to learn Finnish?",
+          text: "Sample question",
           type: "multiple_choice",
-          options: [
-            "Practice daily",
-            "Study once a month",
-            "Never review",
-            "Only take tests",
-          ],
-          correctAnswer: "Practice daily",
-          explanation: "Consistent practice is key! 🐻",
-          points: 1,
+          options: ["A", "B", "C", "D"],
+          correctAnswer: "A",
+          explanation: "Explanation 🐻",
         },
       ],
     });
@@ -46,7 +60,7 @@ export async function callDeepSeek(
           role: "system",
           content:
             systemPrompt ||
-            `You are Otso, a friendly Finnish bear and expert Finnish language teacher. Keep responses concise and friendly. Use 🐻 emoji occasionally.`,
+            `You are Otso, a friendly Finnish bear and expert Finnish language teacher. Keep responses concise. Return ONLY valid JSON when requested.`,
         },
         {
           role: "user",
@@ -54,8 +68,8 @@ export async function callDeepSeek(
         },
       ],
       model: AI_MODEL,
-      temperature: 0.7,
-      max_tokens: 4000,
+      temperature: 0.5, // Lower temperature for more consistent JSON
+      max_tokens: 3000, // Reduced from 4000
     });
 
     return completion.choices[0]?.message?.content || "";

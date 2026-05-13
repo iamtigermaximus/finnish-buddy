@@ -1,561 +1,3 @@
-// // src/app/topics/[topicId]/page.tsx
-// "use client";
-
-// import { useState, useEffect } from "react";
-// import { useParams, useRouter } from "next/navigation";
-// import { useSession } from "next-auth/react";
-// import styled from "styled-components";
-// import MainLayout from "@/components/layout/MainLayout";
-// import Container from "@/components/layout/Container";
-// import LoadingSpinner from "@/components/ui/LoadingSpinner";
-// import GrammarSection from "@/components/grammar/GrammarSection";
-// import ExamplesSection from "@/components/grammar/ExamplesSection";
-// import PracticeSection from "@/components/practice/PracticeSection";
-// import QuizSection from "@/components/quiz/QuizSection";
-
-// const TopicHeader = styled.div`
-//   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-//   color: white;
-//   padding: 2rem;
-//   border-radius: 16px;
-//   margin-bottom: 2rem;
-
-//   @media (max-width: 768px) {
-//     padding: 1.5rem;
-//   }
-// `;
-
-// const TopicTitle = styled.h1`
-//   font-size: 2rem;
-//   margin-bottom: 0.5rem;
-
-//   @media (max-width: 768px) {
-//     font-size: 1.5rem;
-//   }
-// `;
-
-// const TopicDescription = styled.p`
-//   opacity: 0.95;
-//   font-size: 1rem;
-//   line-height: 1.5;
-// `;
-
-// const LevelBadge = styled.div<{ $color: string }>`
-//   display: inline-block;
-//   background: ${(props) => props.$color}40;
-//   padding: 0.25rem 1rem;
-//   border-radius: 9999px;
-//   font-size: 0.75rem;
-//   margin-top: 0.5rem;
-//   color: ${(props) => props.$color};
-// `;
-
-// const StepsContainer = styled.div`
-//   background: white;
-//   border-radius: 16px;
-//   padding: 1.5rem;
-//   margin-bottom: 2rem;
-//   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-
-//   @media (max-width: 768px) {
-//     padding: 1rem;
-//   }
-// `;
-
-// const StepsGrid = styled.div`
-//   display: grid;
-//   grid-template-columns: repeat(4, 1fr);
-//   gap: 1rem;
-
-//   @media (max-width: 768px) {
-//     grid-template-columns: repeat(2, 1fr);
-//     gap: 0.5rem;
-//   }
-
-//   @media (max-width: 480px) {
-//     grid-template-columns: 1fr;
-//   }
-// `;
-
-// const StepCard = styled.button<{ $active: boolean; $completed: boolean }>`
-//   padding: 1rem;
-//   border: 2px solid
-//     ${(props) =>
-//       props.$active ? "#667eea" : props.$completed ? "#48bb78" : "#e0e0e0"};
-//   background: ${(props) => (props.$active ? "#667eea10" : "white")};
-//   border-radius: 8px;
-//   cursor: ${(props) =>
-//     props.$active || props.$completed ? "pointer" : "not-allowed"};
-//   transition: all 0.2s;
-//   text-align: left;
-//   opacity: ${(props) => (!props.$active && !props.$completed ? 0.6 : 1)};
-
-//   &:hover {
-//     transform: ${(props) =>
-//       props.$active || props.$completed ? "translateY(-2px)" : "none"};
-//     box-shadow: ${(props) =>
-//       props.$active || props.$completed
-//         ? "0 10px 15px -3px rgba(0, 0, 0, 0.1)"
-//         : "none"};
-//   }
-// `;
-
-// const StepIcon = styled.div<{ $completed: boolean }>`
-//   width: 40px;
-//   height: 40px;
-//   border-radius: 9999px;
-//   background: ${(props) => (props.$completed ? "#48bb78" : "#667eea")};
-//   color: white;
-//   display: flex;
-//   align-items: center;
-//   justify-content: center;
-//   font-size: 1.25rem;
-//   margin-bottom: 0.5rem;
-// `;
-
-// const StepTitle = styled.h3`
-//   font-size: 1rem;
-//   margin-bottom: 0.25rem;
-//   color: #1a1a2e;
-// `;
-
-// const StepDescription = styled.p`
-//   font-size: 0.75rem;
-//   color: #666;
-// `;
-
-// const ContentArea = styled.div`
-//   background: white;
-//   border-radius: 16px;
-//   padding: 2rem;
-//   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-//   min-height: 500px;
-
-//   @media (max-width: 768px) {
-//     padding: 1.5rem;
-//   }
-// `;
-
-// const NavigationButtons = styled.div`
-//   display: flex;
-//   justify-content: space-between;
-//   margin-top: 2rem;
-//   gap: 1rem;
-
-//   button {
-//     padding: 0.75rem 2rem;
-//     border: none;
-//     border-radius: 8px;
-//     font-weight: 600;
-//     cursor: pointer;
-//     transition: all 0.2s;
-
-//     &:hover {
-//       transform: translateY(-2px);
-//     }
-
-//     &:disabled {
-//       opacity: 0.5;
-//       cursor: not-allowed;
-//       transform: none;
-//     }
-//   }
-// `;
-
-// const PrevButton = styled.button`
-//   background: #e0e0e0;
-//   color: #1a1a2e;
-
-//   &:hover {
-//     background: #d0d0d0;
-//   }
-// `;
-
-// const NextButton = styled.button`
-//   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-//   color: white;
-// `;
-
-// const ButtonGroup = styled.div`
-//   display: flex;
-//   gap: 1rem;
-//   justify-content: flex-end;
-// `;
-
-// const SuccessButton = styled(NextButton)`
-//   background: #48bb78;
-// `;
-
-// enum LearningStep {
-//   GRAMMAR = 0,
-//   EXAMPLES = 1,
-//   PRACTICE = 2,
-//   QUIZ = 3,
-// }
-
-// const steps = [
-//   { title: "Grammar & Rules", description: "Learn the theory", icon: "📖" },
-//   { title: "Examples", description: "See it in action", icon: "💡" },
-//   { title: "Practice", description: "Interactive exercises", icon: "✏️" },
-//   { title: "Quiz", description: "Test your knowledge", icon: "📝" },
-// ];
-
-// interface GrammarExample {
-//   finnish: string;
-//   english: string;
-//   explanation?: string;
-// }
-
-// interface GrammarRule {
-//   id: string;
-//   title: string;
-//   explanation: string;
-//   rules: string;
-//   examples: GrammarExample[];
-// }
-
-// interface VocabularyWord {
-//   finnish: string;
-//   english: string;
-//   memoryTip: string | null;
-//   exampleSentence: string | null;
-// }
-
-// interface QuizQuestion {
-//   id: string;
-//   text: string;
-//   type: string;
-//   options: string | null;
-//   correctAnswer: string;
-//   explanation: string | null;
-// }
-
-// interface Quiz {
-//   id: string;
-//   title: string;
-//   description: string;
-//   passingScore: number;
-//   questions: QuizQuestion[];
-// }
-
-// interface LevelInfo {
-//   name: string;
-//   title: string;
-//   color: string;
-// }
-
-// interface TopicProgress {
-//   grammarViewed: boolean;
-//   examplesViewed: boolean;
-//   practiceCompleted: boolean;
-//   quizCompleted: boolean;
-//   completed: boolean;
-// }
-
-// interface TopicData {
-//   id: string;
-//   title: string;
-//   description: string;
-//   level: LevelInfo;
-//   grammarRules: GrammarRule[];
-//   examples: GrammarExample[];
-//   memoryAid: {
-//     mnemonic: string;
-//     explanation: string;
-//     quickTips: string;
-//     colorCode: string;
-//     icon: string;
-//   } | null;
-//   vocabulary: VocabularyWord[];
-//   quizzes: Quiz[];
-//   progress: TopicProgress[] | null;
-// }
-
-// interface LevelTopic {
-//   id: string;
-//   title: string;
-//   order: number;
-// }
-
-// interface LevelData {
-//   id: string;
-//   name: string;
-//   topics: LevelTopic[];
-// }
-
-// export default function TopicPage() {
-//   const params = useParams();
-//   const router = useRouter();
-//   const { data: session } = useSession();
-//   const [topic, setTopic] = useState<TopicData | null>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [currentStep, setCurrentStep] = useState<LearningStep>(
-//     LearningStep.GRAMMAR,
-//   );
-//   const [completedSteps, setCompletedSteps] = useState<Set<LearningStep>>(
-//     new Set(),
-//   );
-//   const [quizCompleted, setQuizCompleted] = useState(false);
-//   const [nextTopicId, setNextTopicId] = useState<string | null>(null);
-
-//   useEffect(() => {
-//     const fetchTopic = async () => {
-//       try {
-//         const topicId = params.topicId as string;
-//         const response = await fetch(`/api/topics/${topicId}`);
-//         const data = await response.json();
-//         setTopic(data);
-
-//         if (data.progress && data.progress[0]) {
-//           const progress = data.progress[0];
-//           const completed = new Set<LearningStep>();
-//           if (progress.grammarViewed) completed.add(LearningStep.GRAMMAR);
-//           if (progress.examplesViewed) completed.add(LearningStep.EXAMPLES);
-//           if (progress.practiceCompleted) completed.add(LearningStep.PRACTICE);
-//           if (progress.quizCompleted) completed.add(LearningStep.QUIZ);
-//           setCompletedSteps(completed);
-
-//           if (!progress.grammarViewed) setCurrentStep(LearningStep.GRAMMAR);
-//           else if (!progress.examplesViewed)
-//             setCurrentStep(LearningStep.EXAMPLES);
-//           else if (!progress.practiceCompleted)
-//             setCurrentStep(LearningStep.PRACTICE);
-//           else if (!progress.quizCompleted) setCurrentStep(LearningStep.QUIZ);
-//           else setCurrentStep(LearningStep.QUIZ);
-//         }
-//       } catch (error) {
-//         console.error("Failed to fetch topic:", error);
-//       } finally {
-//         setLoading(false);
-//       }
-//     };
-
-//     if (session) {
-//       fetchTopic();
-//     }
-//   }, [params.topicId, session]);
-
-//   useEffect(() => {
-//     const findNextTopic = async () => {
-//       if (!topic?.level?.name) return;
-
-//       try {
-//         const levelResponse = await fetch(
-//           `/api/levels?level=${topic.level.name}`,
-//         );
-//         const levelData = await levelResponse.json();
-//         const currentLevel = Array.isArray(levelData)
-//           ? levelData[0]
-//           : levelData;
-
-//         if (currentLevel?.topics && Array.isArray(currentLevel.topics)) {
-//           const currentIndex = currentLevel.topics.findIndex(
-//             (t: LevelTopic) => t.id === topic.id,
-//           );
-//           if (
-//             currentIndex !== -1 &&
-//             currentIndex < currentLevel.topics.length - 1
-//           ) {
-//             setNextTopicId(currentLevel.topics[currentIndex + 1].id);
-//           }
-//         }
-//       } catch (error) {
-//         console.error("Failed to find next topic:", error);
-//       }
-//     };
-
-//     if (topic) {
-//       findNextTopic();
-//     }
-//   }, [topic]);
-
-//   const markStepCompleted = async (step: LearningStep) => {
-//     const stepName = LearningStep[step].toLowerCase();
-//     const newCompleted = new Set(completedSteps);
-//     newCompleted.add(step);
-//     setCompletedSteps(newCompleted);
-
-//     try {
-//       await fetch("/api/progress", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           topicId: params.topicId,
-//           step: stepName,
-//           completed: true,
-//         }),
-//       });
-//     } catch (error) {
-//       console.error("Failed to save progress:", error);
-//     }
-//   };
-
-//   const handleNext = () => {
-//     markStepCompleted(currentStep);
-//     if (currentStep < LearningStep.QUIZ) {
-//       setCurrentStep(currentStep + 1);
-//       window.scrollTo({ top: 0, behavior: "smooth" });
-//     }
-//   };
-
-//   const handlePrevious = () => {
-//     if (currentStep > LearningStep.GRAMMAR) {
-//       setCurrentStep(currentStep - 1);
-//       window.scrollTo({ top: 0, behavior: "smooth" });
-//     }
-//   };
-
-//   const handleQuizComplete = async (score: number) => {
-//     setQuizCompleted(true);
-
-//     try {
-//       await fetch("/api/progress", {
-//         method: "POST",
-//         headers: { "Content-Type": "application/json" },
-//         body: JSON.stringify({
-//           topicId: params.topicId,
-//           step: "quiz",
-//           completed: true,
-//           score: score,
-//         }),
-//       });
-
-//       markStepCompleted(LearningStep.QUIZ);
-//     } catch (error) {
-//       console.error("Failed to save quiz progress:", error);
-//     }
-//   };
-
-//   const isStepUnlocked = (step: LearningStep) => {
-//     if (step === LearningStep.GRAMMAR) return true;
-//     if (step === LearningStep.EXAMPLES)
-//       return completedSteps.has(LearningStep.GRAMMAR);
-//     if (step === LearningStep.PRACTICE)
-//       return completedSteps.has(LearningStep.EXAMPLES);
-//     if (step === LearningStep.QUIZ)
-//       return completedSteps.has(LearningStep.PRACTICE);
-//     return false;
-//   };
-
-//   if (loading || !topic) {
-//     return (
-//       <MainLayout>
-//         <LoadingSpinner fullScreen message="Loading lesson... 🐻" />
-//       </MainLayout>
-//     );
-//   }
-
-//   const levelColor = topic.level?.color || "#667eea";
-
-//   return (
-//     <MainLayout>
-//       <Container>
-//         <TopicHeader>
-//           <TopicTitle>{topic.title}</TopicTitle>
-//           <TopicDescription>{topic.description}</TopicDescription>
-//           <LevelBadge $color={levelColor}>
-//             {topic.level?.name} - {topic.level?.title}
-//           </LevelBadge>
-//         </TopicHeader>
-
-//         <StepsContainer>
-//           <StepsGrid>
-//             {steps.map((step, index) => {
-//               const isActive = currentStep === index;
-//               const isCompleted = completedSteps.has(index);
-//               const isUnlocked = isStepUnlocked(index);
-
-//               return (
-//                 <StepCard
-//                   key={index}
-//                   $active={isActive}
-//                   $completed={isCompleted}
-//                   onClick={() => isUnlocked && setCurrentStep(index)}
-//                 >
-//                   <StepIcon $completed={isCompleted}>
-//                     {isCompleted ? "✓" : step.icon}
-//                   </StepIcon>
-//                   <StepTitle>{step.title}</StepTitle>
-//                   <StepDescription>{step.description}</StepDescription>
-//                 </StepCard>
-//               );
-//             })}
-//           </StepsGrid>
-//         </StepsContainer>
-
-//         <ContentArea>
-//           {currentStep === LearningStep.GRAMMAR && (
-//             <GrammarSection
-//               grammarRules={topic.grammarRules}
-//               memoryAid={topic.memoryAid}
-//               onComplete={() => markStepCompleted(LearningStep.GRAMMAR)}
-//             />
-//           )}
-
-//           {currentStep === LearningStep.EXAMPLES && (
-//             <ExamplesSection
-//               examples={topic.examples}
-//               grammarRules={topic.grammarRules}
-//               vocabulary={topic.vocabulary}
-//               onComplete={() => markStepCompleted(LearningStep.EXAMPLES)}
-//             />
-//           )}
-
-//           {currentStep === LearningStep.PRACTICE && (
-//             <PracticeSection
-//               topicId={topic.id}
-//               topicTitle={topic.title}
-//               grammarRules={topic.grammarRules}
-//               onComplete={() => markStepCompleted(LearningStep.PRACTICE)}
-//             />
-//           )}
-
-//           {currentStep === LearningStep.QUIZ && (
-//             <QuizSection
-//               quiz={topic.quizzes?.[0]}
-//               topicId={topic.id}
-//               topicTitle={topic.title}
-//               onComplete={handleQuizComplete}
-//               isCompleted={completedSteps.has(LearningStep.QUIZ)}
-//             />
-//           )}
-
-//           <NavigationButtons>
-//             <div>
-//               {currentStep > LearningStep.GRAMMAR && (
-//                 <PrevButton onClick={handlePrevious}>← Previous</PrevButton>
-//               )}
-//             </div>
-//             <ButtonGroup>
-//               {currentStep < LearningStep.QUIZ && (
-//                 <NextButton onClick={handleNext}>
-//                   Next: {steps[currentStep + 1].title} →
-//                 </NextButton>
-//               )}
-//               {currentStep === LearningStep.QUIZ && quizCompleted && (
-//                 <>
-//                   <NextButton onClick={() => router.push("/levels")}>
-//                     Back to Levels
-//                   </NextButton>
-//                   {nextTopicId && (
-//                     <SuccessButton
-//                       onClick={() => {
-//                         router.push(`/topics/${nextTopicId}`);
-//                         router.refresh();
-//                       }}
-//                     >
-//                       Next Topic →
-//                     </SuccessButton>
-//                   )}
-//                 </>
-//               )}
-//             </ButtonGroup>
-//           </NavigationButtons>
-//         </ContentArea>
-//       </Container>
-//     </MainLayout>
-//   );
-// }
 // src/app/topics/[topicId]/page.tsx
 "use client";
 
@@ -846,6 +288,50 @@ const ScoreCircle = styled.div<{ $score: number }>`
   }
 `;
 
+// Error components
+const ErrorContainer = styled.div`
+  text-align: center;
+  padding: 4rem 2rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  max-width: 600px;
+  margin: 2rem auto;
+`;
+
+const ErrorIcon = styled.div`
+  font-size: 4rem;
+  margin-bottom: 1rem;
+`;
+
+const ErrorTitle = styled.h2`
+  font-size: 1.75rem;
+  color: #f56565;
+  margin-bottom: 1rem;
+`;
+
+const ErrorMessage = styled.p`
+  color: #666;
+  margin-bottom: 1.5rem;
+  line-height: 1.6;
+`;
+
+const ErrorHint = styled.p`
+  color: #999;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid #e0e0e0;
+`;
+
+const ButtonGroup = styled.div`
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+`;
+
 const steps = [
   { icon: "📖", title: "Grammar", desc: "Learn the rules" },
   { icon: "💡", title: "Examples", desc: "See it in action" },
@@ -884,6 +370,8 @@ export default function TopicPage() {
   const [level, setLevel] = useState("A1");
   const [lesson, setLesson] = useState<GeneratedLesson | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [friendlyError, setFriendlyError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
 
@@ -904,11 +392,17 @@ export default function TopicPage() {
     const fetchTopicAndGenerateLesson = async () => {
       try {
         const topicId = params.topicId as string;
+
+        // Fetch topic info
         const topicRes = await fetch(`/api/topics/${topicId}`);
+        if (!topicRes.ok) {
+          throw new Error("Failed to fetch topic information");
+        }
         const topicData = await topicRes.json();
         setTopicTitle(topicData.title);
         setLevel(topicData.level?.name || "A1");
 
+        // Generate lesson
         const lessonRes = await fetch("/api/ai/generate-lesson", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -918,10 +412,25 @@ export default function TopicPage() {
             numberOfQuestions: 10,
           }),
         });
+
         const lessonData = await lessonRes.json();
+
+        if (!lessonRes.ok) {
+          setFriendlyError(
+            lessonData.friendlyMessage ||
+              "🐻 Oops! Otso is having trouble creating your lesson right now. Please try again in a moment.",
+          );
+          setError(lessonData.error || "Failed to generate lesson");
+          return;
+        }
+
         setLesson(lessonData);
-      } catch (error) {
-        console.error("Failed to generate lesson:", error);
+      } catch (err) {
+        console.error("Failed to generate lesson:", err);
+        setFriendlyError(
+          "🐻 Oops! Otso is having trouble creating your lesson right now. This might be because our AI is busy or there's a connection issue.",
+        );
+        setError(err instanceof Error ? err.message : "Unknown error");
       } finally {
         setLoading(false);
       }
@@ -983,6 +492,37 @@ export default function TopicPage() {
     lesson &&
     Object.keys(practiceResults).length === lesson.practiceExercises.length &&
     Object.values(practiceResults).every((v) => v === true);
+
+  // Show error state
+  if (error) {
+    return (
+      <MainLayout>
+        <Container>
+          <ErrorContainer>
+            <ErrorIcon>🐻</ErrorIcon>
+            <ErrorTitle>Oops! Something went wrong</ErrorTitle>
+            <ErrorMessage>{friendlyError || error}</ErrorMessage>
+            <ButtonGroup>
+              <Button
+                onClick={() => window.location.reload()}
+                variant="primary"
+              >
+                Try Again
+              </Button>
+              <Button href="/levels" variant="secondary">
+                Back to Levels
+              </Button>
+            </ButtonGroup>
+            <ErrorHint>
+              {process.env.NODE_ENV === "development" && `Debug: ${error}`}
+              <br />
+              <small>If this keeps happening, please try again later.</small>
+            </ErrorHint>
+          </ErrorContainer>
+        </Container>
+      </MainLayout>
+    );
+  }
 
   if (loading || !lesson) {
     return (
