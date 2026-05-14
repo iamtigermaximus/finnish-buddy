@@ -92,7 +92,7 @@ export default function Footer() {
             >
               Learn Finnish with Otso the bear. From A1 to C2 mastery.
             </p>
-            <SocialLinks>
+            {/* <SocialLinks>
               <SocialLink href="#" target="_blank">
                 📘
               </SocialLink>
@@ -102,7 +102,7 @@ export default function Footer() {
               <SocialLink href="#" target="_blank">
                 📷
               </SocialLink>
-            </SocialLinks>
+            </SocialLinks> */}
           </FooterSection>
 
           <FooterSection>
@@ -114,15 +114,17 @@ export default function Footer() {
             <FooterLink href="/levels?level=B2">
               B2 Upper Intermediate
             </FooterLink>
+            <FooterLink href="/levels?level=C1">C1 Advanced</FooterLink>{" "}
+            <FooterLink href="/levels?level=C2">C2 Proficient</FooterLink>
           </FooterSection>
 
-          <FooterSection>
+          {/* <FooterSection>
             <h3>Resources</h3>
             <FooterLink href="/grammar">Grammar Guide</FooterLink>
             <FooterLink href="/vocabulary">Vocabulary</FooterLink>
             <FooterLink href="/blog">Blog</FooterLink>
             <FooterLink href="/faq">FAQ</FooterLink>
-          </FooterSection>
+          </FooterSection> */}
 
           <FooterSection>
             <h3>Company</h3>
