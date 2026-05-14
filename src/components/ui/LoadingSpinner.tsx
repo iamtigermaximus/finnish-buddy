@@ -51,7 +51,7 @@ export default function LoadingSpinner({
   return (
     <SpinnerContainer $fullScreen={fullScreen}>
       <div>
-        <Spinner />
+        {/* <Spinner /> */}
         <BearMessage>
           <div className="bear">🐻</div>
           {message && <p>{message}</p>}

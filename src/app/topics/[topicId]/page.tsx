@@ -1,4 +1,3 @@
-// src/app/topics/[topicId]/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -288,7 +287,6 @@ const ScoreCircle = styled.div<{ $score: number }>`
   }
 `;
 
-// Error components
 const ErrorContainer = styled.div`
   text-align: center;
   padding: 4rem 2rem;
@@ -362,6 +360,15 @@ interface GeneratedLesson {
   }>;
 }
 
+interface QuizResultItem {
+  questionText: string;
+  userAnswer: string;
+  correctAnswer: string;
+  isCorrect: boolean;
+  explanation: string;
+  userAnswerDisplay: string;
+}
+
 export default function TopicPage() {
   const params = useParams();
   const router = useRouter();
@@ -374,8 +381,8 @@ export default function TopicPage() {
   const [friendlyError, setFriendlyError] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const [quizResults, setQuizResults] = useState<QuizResultItem[]>([]);
 
-  // Practice state
   const [practiceAnswers, setPracticeAnswers] = useState<
     Record<string, string>
   >({});
@@ -383,7 +390,6 @@ export default function TopicPage() {
     Record<string, boolean>
   >({});
 
-  // Quiz state
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
   const [quizSubmitted, setQuizSubmitted] = useState(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
@@ -393,7 +399,6 @@ export default function TopicPage() {
       try {
         const topicId = params.topicId as string;
 
-        // Fetch topic info
         const topicRes = await fetch(`/api/topics/${topicId}`);
         if (!topicRes.ok) {
           throw new Error("Failed to fetch topic information");
@@ -402,7 +407,6 @@ export default function TopicPage() {
         setTopicTitle(topicData.title);
         setLevel(topicData.level?.name || "A1");
 
-        // Generate lesson
         const lessonRes = await fetch("/api/ai/generate-lesson", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -441,14 +445,30 @@ export default function TopicPage() {
     }
   }, [params.topicId, session]);
 
-  const markStepCompleted = (step: number) => {
+  const markStepCompleted = async (step: number) => {
     if (!completedSteps.includes(step)) {
       setCompletedSteps([...completedSteps, step]);
+
+      const stepNames = ["grammar", "examples", "practice", "quiz"];
+      try {
+        await fetch("/api/progress", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topicId: params.topicId,
+            step: stepNames[step],
+            completed: true,
+          }),
+        });
+        console.log(`✅ Step "${stepNames[step]}" saved to database`);
+      } catch (error) {
+        console.error("Failed to save step progress:", error);
+      }
     }
   };
 
-  const handleNext = () => {
-    markStepCompleted(currentStep);
+  const handleNext = async () => {
+    await markStepCompleted(currentStep);
     if (currentStep < 3) {
       setCurrentStep(currentStep + 1);
       window.scrollTo({ top: 0, behavior: "smooth" });
@@ -471,20 +491,38 @@ export default function TopicPage() {
     setPracticeResults({ ...practiceResults, [index]: isCorrect });
   };
 
-  const submitQuiz = () => {
+  const submitQuiz = async () => {
     if (!lesson) return;
+
+    const questionResults: QuizResultItem[] = [];
     let correct = 0;
+
     lesson.quizQuestions.forEach((q, idx) => {
       const userAnswer = quizAnswers[`q${idx}`] || "";
-      if (userAnswer.toLowerCase().trim() === q.correctAnswer.toLowerCase()) {
+      const isCorrect =
+        userAnswer.toLowerCase().trim() === q.correctAnswer.toLowerCase();
+
+      if (isCorrect) {
         correct++;
       }
+
+      questionResults.push({
+        questionText: q.text,
+        userAnswer: userAnswer,
+        correctAnswer: q.correctAnswer,
+        isCorrect: isCorrect,
+        explanation: q.explanation,
+        userAnswerDisplay: quizAnswers[`q${idx}`] || "(No answer)",
+      });
     });
+
     const score = Math.round((correct / lesson.quizQuestions.length) * 100);
     setQuizScore(score);
+    setQuizResults(questionResults);
     setQuizSubmitted(true);
+
     if (score >= 70) {
-      markStepCompleted(3);
+      await markStepCompleted(3);
     }
   };
 
@@ -493,7 +531,6 @@ export default function TopicPage() {
     Object.keys(practiceResults).length === lesson.practiceExercises.length &&
     Object.values(practiceResults).every((v) => v === true);
 
-  // Show error state
   if (error) {
     return (
       <MainLayout>
@@ -718,24 +755,102 @@ export default function TopicPage() {
           )}
 
           {currentStep === 3 && quizSubmitted && quizScore !== null && (
-            <ResultsContainer>
-              <ScoreCircle $score={quizScore}>
-                <span>{quizScore}%</span>
-              </ScoreCircle>
-              <h2>
-                {quizScore >= 70
-                  ? "🎉 Congratulations!"
-                  : "📚 Keep Practicing!"}
-              </h2>
-              <p style={{ marginBottom: "1rem" }}>
-                {quizScore >= 70
-                  ? `You passed with ${quizScore}%! Great job mastering ${topicTitle}. 🐻`
-                  : `You scored ${quizScore}%. The passing score is 70%.`}
-              </p>
-              <Button onClick={() => router.push("/levels")} variant="primary">
-                Back to Levels
-              </Button>
-            </ResultsContainer>
+            <div>
+              <ResultsContainer>
+                <ScoreCircle $score={quizScore}>
+                  <span>{quizScore}%</span>
+                </ScoreCircle>
+                <h2>
+                  {quizScore >= 70
+                    ? "🎉 Congratulations!"
+                    : "📚 Keep Practicing!"}
+                </h2>
+                <p style={{ marginBottom: "1rem" }}>
+                  {quizScore >= 70
+                    ? `You passed with ${quizScore}%! Great job mastering ${topicTitle}. 🐻`
+                    : `You scored ${quizScore}%. The passing score is 70%.`}
+                </p>
+              </ResultsContainer>
+
+              {/* Detailed Results */}
+              <div style={{ marginTop: "2rem" }}>
+                <h3>📋 Detailed Results:</h3>
+                {quizResults.map((result, idx) => (
+                  <div
+                    key={idx}
+                    style={{
+                      background: result.isCorrect ? "#48bb7820" : "#f5656520",
+                      borderLeft: `4px solid ${result.isCorrect ? "#48bb78" : "#f56565"}`,
+                      padding: "1rem",
+                      marginBottom: "1rem",
+                      borderRadius: "8px",
+                    }}
+                  >
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <strong>Question {idx + 1}:</strong>
+                      <span
+                        style={{
+                          color: result.isCorrect ? "#48bb78" : "#f56565",
+                        }}
+                      >
+                        {result.isCorrect ? "✓ Correct" : "✗ Incorrect"}
+                      </span>
+                    </div>
+                    <p style={{ marginTop: "0.5rem" }}>{result.questionText}</p>
+                    <div style={{ marginTop: "0.5rem", fontSize: "0.875rem" }}>
+                      <div>
+                        <strong>Your answer:</strong> {result.userAnswerDisplay}
+                      </div>
+                      {!result.isCorrect && (
+                        <div style={{ color: "#48bb78", marginTop: "0.25rem" }}>
+                          <strong>Correct answer:</strong>{" "}
+                          {result.correctAnswer}
+                        </div>
+                      )}
+                      <div
+                        style={{
+                          color: "#666",
+                          marginTop: "0.5rem",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        💡 {result.explanation}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <ButtonGroup
+                style={{ marginTop: "2rem", justifyContent: "center" }}
+              >
+                <Button
+                  onClick={() => router.push("/levels")}
+                  variant="primary"
+                >
+                  Back to Levels
+                </Button>
+                {quizScore < 70 && (
+                  <Button
+                    onClick={() => {
+                      setQuizSubmitted(false);
+                      setQuizAnswers({});
+                      setQuizScore(null);
+                      setQuizResults([]);
+                    }}
+                    variant="secondary"
+                  >
+                    Try Again
+                  </Button>
+                )}
+              </ButtonGroup>
+            </div>
           )}
 
           {currentStep < 3 && (

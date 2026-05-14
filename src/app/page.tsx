@@ -223,7 +223,7 @@ export default function HomePage() {
       <HeroSection>
         <Container>
           <BearCharacter>🐻</BearCharacter>
-          <HeroTitle>Learn Finnish with a Friend</HeroTitle>
+          <HeroTitle>Learn Finnish with Otso</HeroTitle>
           <HeroSubtitle>
             Master Finnish from A1 to C2 with AI-powered lessons, interactive
             quizzes,
