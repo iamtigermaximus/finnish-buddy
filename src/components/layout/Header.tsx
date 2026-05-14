@@ -226,6 +226,7 @@ export default function Header() {
                 <NavLink href="/dashboard">Dashboard</NavLink>
                 <NavLink href="/levels">Levels</NavLink>
                 <NavLink href="/progress">My Progress</NavLink>
+                <NavLink href="/ask-otso">Ask Otso 🐻</NavLink>
                 <UserName>
                   <BearAvatar>🐻</BearAvatar>
                   Hei, {userName}!
@@ -260,6 +261,7 @@ export default function Header() {
                 <NavLink href="/progress" onClick={() => setIsMenuOpen(false)}>
                   My Progress
                 </NavLink>
+                <NavLink href="/ask-otso">Ask Otso 🐻</NavLink>
                 <UserName>
                   <BearAvatar>🐻</BearAvatar>
                   Hei, {userName}!

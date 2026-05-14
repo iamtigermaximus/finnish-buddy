@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import styled from "styled-components";
+import WordOfTheDay from "@/components/word-of the-day/WordOfTheDay";
 
 const WelcomeCard = styled(Card)`
   text-align: center;
@@ -149,6 +150,8 @@ export default function DashboardPage() {
     <AuthGuard>
       <MainLayout>
         <Container>
+          {/* ✅ WORD OF THE DAY */}
+          <WordOfTheDay />
           <WelcomeCard variant="bear">
             <div className="bear">🐻</div>
             <h1>Hei, {user?.name || "Friend"}! 👋</h1>
