@@ -566,7 +566,7 @@ export default function TopicPage() {
       <MainLayout>
         <LoadingSpinner
           fullScreen
-          message="✨ Generating your personalized lesson with AI... 🐻"
+          message="✨ Otso is generating your personalized lesson ... 🐻"
         />
       </MainLayout>
     );

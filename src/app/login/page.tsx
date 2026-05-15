@@ -15,104 +15,90 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(
-    135deg,
-    ${(props) => props.theme.colors.primary} 0%,
-    ${(props) => props.theme.colors.secondary} 100%
-  );
-  padding: ${(props) => props.theme.spacing.md};
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 1rem;
 `;
 
 const LoginCard = styled.div`
-  background: ${(props) => props.theme.colors.white};
-  border-radius: ${(props) => props.theme.borderRadius.xl};
-  padding: ${(props) => props.theme.spacing.xl};
+  background: white;
+  border-radius: 20px;
+  padding: 2rem;
   width: 100%;
   max-width: 440px;
-  box-shadow: ${(props) => props.theme.shadows.xl};
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
   animation: fadeIn 0.5s ease;
 
-  @media (max-width: ${(props) => props.theme.breakpoints.mobile}) {
-    padding: ${(props) => props.theme.spacing.lg};
+  @media (max-width: 640px) {
+    padding: 1.5rem;
   }
 `;
 
 const BearIcon = styled.div`
   text-align: center;
   font-size: 4rem;
-  margin-bottom: ${(props) => props.theme.spacing.md};
+  margin-bottom: 1rem;
   animation: bounce 2s ease infinite;
 `;
 
 const Title = styled.h1`
   font-size: 1.75rem;
-  color: ${(props) => props.theme.colors.text};
-  margin-bottom: ${(props) => props.theme.spacing.xs};
+  color: #1a1a2e;
+  margin-bottom: 0.5rem;
   text-align: center;
 `;
 
 const Subtitle = styled.p`
   text-align: center;
-  color: ${(props) => props.theme.colors.textLight};
-  margin-bottom: ${(props) => props.theme.spacing.xl};
+  color: #666;
+  margin-bottom: 2rem;
   font-size: 0.875rem;
 `;
 
 const Form = styled.form`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => props.theme.spacing.lg};
+  gap: 1rem;
 `;
 
 const InputGroup = styled.div`
   display: flex;
   flex-direction: column;
-  gap: ${(props) => props.theme.spacing.xs};
+  gap: 0.25rem;
 `;
 
 const Label = styled.label`
   font-weight: 600;
-  color: ${(props) => props.theme.colors.text};
+  color: #1a1a2e;
   font-size: 0.875rem;
 `;
 
 const Input = styled.input<{ $hasError?: boolean }>`
-  padding: ${(props) => props.theme.spacing.md};
-  border: 2px solid
-    ${(props) =>
-      props.$hasError ? props.theme.colors.danger : props.theme.colors.border};
-  border-radius: ${(props) => props.theme.borderRadius.md};
+  padding: 0.75rem;
+  border: 2px solid ${(props) => (props.$hasError ? "#f56565" : "#e0e0e0")};
+  border-radius: 8px;
   font-size: 1rem;
   transition: all 0.2s;
 
   &:focus {
     outline: none;
-    border-color: ${(props) =>
-      props.$hasError ? props.theme.colors.danger : props.theme.colors.primary};
+    border-color: ${(props) => (props.$hasError ? "#f56565" : "#667eea")};
     box-shadow: 0 0 0 3px
-      ${(props) =>
-        props.$hasError
-          ? props.theme.colors.danger + "20"
-          : props.theme.colors.primary + "20"};
+      ${(props) => (props.$hasError ? "#f5656520" : "#667eea20")};
   }
 `;
 
 const ErrorMessage = styled.span`
-  color: ${(props) => props.theme.colors.danger};
+  color: #f56565;
   font-size: 0.75rem;
-  margin-top: ${(props) => props.theme.spacing.xs};
+  margin-top: 0.25rem;
 `;
 
 const SubmitButton = styled.button`
-  background: linear-gradient(
-    135deg,
-    ${(props) => props.theme.colors.primary} 0%,
-    ${(props) => props.theme.colors.secondary} 100%
-  );
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: ${(props) => props.theme.spacing.md};
+  padding: 0.75rem;
   border: none;
-  border-radius: ${(props) => props.theme.borderRadius.md};
+  border-radius: 8px;
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
@@ -120,7 +106,7 @@ const SubmitButton = styled.button`
 
   &:hover {
     transform: translateY(-2px);
-    box-shadow: ${(props) => props.theme.shadows.lg};
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   }
 
   &:disabled {
@@ -132,7 +118,7 @@ const SubmitButton = styled.button`
 
 const Divider = styled.div`
   text-align: center;
-  margin: ${(props) => props.theme.spacing.lg} 0;
+  margin: 1.5rem 0;
   position: relative;
 
   &::before {
@@ -142,26 +128,53 @@ const Divider = styled.div`
     left: 0;
     right: 0;
     height: 1px;
-    background: ${(props) => props.theme.colors.border};
+    background: #e0e0e0;
   }
 
   span {
-    background: ${(props) => props.theme.colors.white};
-    padding: 0 ${(props) => props.theme.spacing.md};
+    background: white;
+    padding: 0 1rem;
     position: relative;
-    color: ${(props) => props.theme.colors.textLight};
+    color: #666;
     font-size: 0.875rem;
+  }
+`;
+
+const GoogleButton = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #667eea;
+  }
+
+  .google-icon {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #667eea;
   }
 `;
 
 const RegisterLink = styled.p`
   text-align: center;
-  margin-top: ${(props) => props.theme.spacing.lg};
-  color: ${(props) => props.theme.colors.textLight};
+  margin-top: 1.5rem;
+  color: #666;
   font-size: 0.875rem;
 
   a {
-    color: ${(props) => props.theme.colors.primary};
+    color: #667eea;
     font-weight: 600;
     text-decoration: none;
 
@@ -172,14 +185,11 @@ const RegisterLink = styled.p`
 `;
 
 const Toast = styled.div<{ $type: "success" | "error" }>`
-  background: ${(props) =>
-    props.$type === "success"
-      ? props.theme.colors.success
-      : props.theme.colors.danger};
+  background: ${(props) => (props.$type === "success" ? "#48bb78" : "#f56565")};
   color: white;
-  padding: ${(props) => props.theme.spacing.md};
-  border-radius: ${(props) => props.theme.borderRadius.md};
-  margin-bottom: ${(props) => props.theme.spacing.lg};
+  padding: 0.75rem;
+  border-radius: 8px;
+  margin-bottom: 1.5rem;
   text-align: center;
   font-size: 0.875rem;
   animation: fadeIn 0.3s ease;
@@ -187,15 +197,15 @@ const Toast = styled.div<{ $type: "success" | "error" }>`
 
 const ForgotPassword = styled.div`
   text-align: right;
-  margin-top: -${(props) => props.theme.spacing.sm};
+  margin-top: -0.5rem;
 
   a {
-    color: ${(props) => props.theme.colors.textLight};
+    color: #666;
     font-size: 0.75rem;
     text-decoration: none;
 
     &:hover {
-      color: ${(props) => props.theme.colors.primary};
+      color: #667eea;
     }
   }
 `;
@@ -242,6 +252,10 @@ export default function LoginPage() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/" });
   };
 
   return (
@@ -291,11 +305,16 @@ export default function LoginPage() {
         </Form>
 
         <Divider>
-          <span>New to Finnish Buddy?</span>
+          <span>or continue with</span>
         </Divider>
 
+        <GoogleButton onClick={handleGoogleSignIn}>
+          <span className="google-icon">G</span>
+          Sign in with Google
+        </GoogleButton>
+
         <RegisterLink>
-          <Link href="/register">Create free account →</Link>
+          Don&apos;t have an account? <Link href="/register">Sign up →</Link>
         </RegisterLink>
       </LoginCard>
     </Container>

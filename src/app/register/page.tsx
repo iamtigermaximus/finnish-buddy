@@ -1,3 +1,4 @@
+// src/app/register/page.tsx
 "use client";
 
 import { useState } from "react";
@@ -126,6 +127,33 @@ const Divider = styled.div`
   }
 `;
 
+const GoogleButton = styled.button`
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f8f9fa;
+    border-color: #667eea;
+  }
+
+  .google-icon {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: #667eea;
+  }
+`;
+
 const LoginLink = styled.p`
   text-align: center;
   margin-top: 1.5rem;
@@ -153,7 +181,6 @@ const Toast = styled.div<{ $type: "success" | "error" }>`
   font-size: 0.875rem;
 `;
 
-// Define error type
 interface ApiError {
   error?: string;
   message?: string;
@@ -229,6 +256,10 @@ export default function RegisterPage() {
     }
   };
 
+  const handleGoogleSignIn = () => {
+    signIn("google", { callbackUrl: "/" });
+  };
+
   return (
     <Container>
       <RegisterCard>
@@ -298,11 +329,16 @@ export default function RegisterPage() {
         </Form>
 
         <Divider>
-          <span>Already have an account?</span>
+          <span>or sign up with</span>
         </Divider>
 
+        <GoogleButton onClick={handleGoogleSignIn}>
+          <span className="google-icon">G</span>
+          Sign up with Google
+        </GoogleButton>
+
         <LoginLink>
-          <Link href="/login">Sign in instead →</Link>
+          Already have an account? <Link href="/login">Sign in →</Link>
         </LoginLink>
       </RegisterCard>
     </Container>
