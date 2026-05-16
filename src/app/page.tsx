@@ -232,7 +232,7 @@ export default function HomePage() {
           </HeroSubtitle>
           {/* Hero button changes based on login status */}
           <Button href={session ? "/levels" : "/register"} size="large">
-            {session ? "Continue Learning 🐻" : "Start Learning Free 🐻"}
+            {session ? "Continue Learning " : "Start Learning Free "}
           </Button>
         </Container>
       </HeroSection>

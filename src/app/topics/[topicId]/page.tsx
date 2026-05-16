@@ -330,6 +330,22 @@ const ButtonGroup = styled.div`
   flex-wrap: wrap;
 `;
 
+const SuccessButton = styled.button`
+  background: #48bb78;
+  color: white;
+  padding: 0.75rem 2rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #38a169;
+    transform: translateY(-2px);
+  }
+`;
+
 const steps = [
   { icon: "📖", title: "Grammar", desc: "Learn the rules" },
   { icon: "💡", title: "Examples", desc: "See it in action" },
@@ -369,19 +385,33 @@ interface QuizResultItem {
   userAnswerDisplay: string;
 }
 
+interface LevelTopic {
+  id: string;
+  title: string;
+  order: number;
+}
+
+interface LevelData {
+  id: string;
+  name: string;
+  topics: LevelTopic[];
+}
+
 export default function TopicPage() {
   const params = useParams();
   const router = useRouter();
   const { data: session } = useSession();
-  const [topicTitle, setTopicTitle] = useState("");
-  const [level, setLevel] = useState("A1");
+  const [topicTitle, setTopicTitle] = useState<string>("");
+  const [level, setLevel] = useState<string>("A1");
   const [lesson, setLesson] = useState<GeneratedLesson | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
   const [friendlyError, setFriendlyError] = useState<string | null>(null);
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState<number>(0);
   const [completedSteps, setCompletedSteps] = useState<number[]>([]);
   const [quizResults, setQuizResults] = useState<QuizResultItem[]>([]);
+  const [nextTopicId, setNextTopicId] = useState<string | null>(null);
+  const [nextTopicTitle, setNextTopicTitle] = useState<string>("");
 
   const [practiceAnswers, setPracticeAnswers] = useState<
     Record<string, string>
@@ -391,9 +421,10 @@ export default function TopicPage() {
   >({});
 
   const [quizAnswers, setQuizAnswers] = useState<Record<string, string>>({});
-  const [quizSubmitted, setQuizSubmitted] = useState(false);
+  const [quizSubmitted, setQuizSubmitted] = useState<boolean>(false);
   const [quizScore, setQuizScore] = useState<number | null>(null);
 
+  // Fetch topic and generate lesson
   useEffect(() => {
     const fetchTopicAndGenerateLesson = async () => {
       try {
@@ -444,6 +475,43 @@ export default function TopicPage() {
       fetchTopicAndGenerateLesson();
     }
   }, [params.topicId, session]);
+
+  // Find next topic after current topic loads
+  useEffect(() => {
+    const findNextTopic = async () => {
+      if (!topicTitle || !level) return;
+
+      try {
+        const levelResponse = await fetch(`/api/levels?level=${level}`);
+        const levelData = await levelResponse.json();
+        const currentLevel = Array.isArray(levelData)
+          ? levelData[0]
+          : (levelData as LevelData);
+
+        if (currentLevel?.topics && Array.isArray(currentLevel.topics)) {
+          const currentTopicId = params.topicId as string;
+          const currentIndex = currentLevel.topics.findIndex(
+            (t: LevelTopic) => t.id === currentTopicId,
+          );
+
+          if (
+            currentIndex !== -1 &&
+            currentIndex < currentLevel.topics.length - 1
+          ) {
+            const nextTopic = currentLevel.topics[currentIndex + 1];
+            setNextTopicId(nextTopic.id);
+            setNextTopicTitle(nextTopic.title);
+          }
+        }
+      } catch (error) {
+        console.error("Failed to find next topic:", error);
+      }
+    };
+
+    if (topicTitle && level) {
+      findNextTopic();
+    }
+  }, [topicTitle, level, params.topicId]);
 
   const markStepCompleted = async (step: number) => {
     if (!completedSteps.includes(step)) {
@@ -827,15 +895,33 @@ export default function TopicPage() {
                 ))}
               </div>
 
-              <ButtonGroup
-                style={{ marginTop: "2rem", justifyContent: "center" }}
+              {/* Button Group with Next Topic */}
+              <div
+                style={{
+                  display: "flex",
+                  gap: "1rem",
+                  justifyContent: "center",
+                  marginTop: "2rem",
+                  flexWrap: "wrap",
+                }}
               >
                 <Button
                   onClick={() => router.push("/levels")}
-                  variant="primary"
+                  variant="secondary"
                 >
-                  Back to Levels
+                  ← Back to Levels
                 </Button>
+
+                {nextTopicId && quizScore >= 70 && (
+                  <SuccessButton
+                    onClick={() => {
+                      router.push(`/topics/${nextTopicId}`);
+                    }}
+                  >
+                    Next Topic: {nextTopicTitle} →
+                  </SuccessButton>
+                )}
+
                 {quizScore < 70 && (
                   <Button
                     onClick={() => {
@@ -844,12 +930,12 @@ export default function TopicPage() {
                       setQuizScore(null);
                       setQuizResults([]);
                     }}
-                    variant="secondary"
+                    variant="bear"
                   >
-                    Try Again
+                    Try Again 🔄
                   </Button>
                 )}
-              </ButtonGroup>
+              </div>
             </div>
           )}
 
