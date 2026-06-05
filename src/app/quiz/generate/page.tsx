@@ -144,7 +144,7 @@
 //     position: relative;
 //     font-size: 2rem;
 //     font-weight: bold;
-//     color: #48bb78;
+//     color: white;
 //   }
 // `;
 
@@ -548,30 +548,16 @@ const ScoreCircle = styled.div<{ $score: number }>`
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: conic-gradient(
-    #48bb78 0deg ${(props) => (props.$score / 100) * 360}deg,
-    #e0e0e0 ${(props) => (props.$score / 100) * 360}deg
-  );
+  background: #48bb78;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 1.5rem;
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: white;
-    border-radius: 50%;
-  }
 
   span {
-    position: relative;
     font-size: 2rem;
     font-weight: bold;
-    color: #48bb78;
+    color: white;
   }
 `;
 
@@ -620,7 +606,7 @@ const ResultAnswer = styled.p`
 
 const CorrectAnswer = styled.p`
   font-size: 0.875rem;
-  color: #48bb78;
+  color: white;
   margin-bottom: 0.25rem;
 `;
 

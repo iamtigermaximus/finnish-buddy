@@ -112,32 +112,16 @@ const ScoreCircle = styled.div<{ $score: number }>`
   width: 150px;
   height: 150px;
   border-radius: 50%;
-  background: conic-gradient(
-    ${(props) => props.theme.colors.success} 0deg
-      ${(props) => (props.$score / 100) * 360}deg,
-    ${(props) => props.theme.colors.border}
-      ${(props) => (props.$score / 100) * 360}deg
-  );
+  background: ${(props) => props.theme.colors.success};
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto ${(props) => props.theme.spacing.lg};
-  position: relative;
-
-  &::before {
-    content: "";
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: white;
-    border-radius: 50%;
-  }
 
   span {
-    position: relative;
     font-size: 2rem;
     font-weight: bold;
-    color: ${(props) => props.theme.colors.success};
+    color: white;
   }
 `;
 
