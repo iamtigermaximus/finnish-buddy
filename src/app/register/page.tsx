@@ -84,7 +84,7 @@ const ErrorMessage = styled.span`
 `;
 
 const SubmitButton = styled.button`
-  background: #f5f7fa;
+  background: #667eea;
   color: white;
   padding: 0.75rem;
   border: none;

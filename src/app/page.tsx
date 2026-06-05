@@ -9,10 +9,11 @@ import Card from "@/components/ui/Card";
 import { useSession } from "next-auth/react";
 
 const HeroSection = styled.section`
-  background: #f5f7fa;
+  background: #ffffff;
   color: #1a1a2e;
   padding: 4rem 0;
   text-align: center;
+  border-bottom: 1px solid #e0e0e0;
 `;
 
 const HeroTitle = styled.h1`

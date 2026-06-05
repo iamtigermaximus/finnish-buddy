@@ -94,7 +94,7 @@ const ErrorMessage = styled.span`
 `;
 
 const SubmitButton = styled.button`
-  background: #f5f7fa;
+  background: #667eea;
   color: white;
   padding: 0.75rem;
   border: none;
@@ -300,7 +300,7 @@ export default function LoginPage() {
           </ForgotPassword>
 
           <SubmitButton type="submit" disabled={isLoading}>
-            {isLoading ? "Signing in..." : "🐻 Sign In"}
+            {isLoading ? "Signing in..." : " Sign In"}
           </SubmitButton>
         </Form>
 
