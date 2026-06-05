@@ -52,11 +52,7 @@ const RulesList = styled.ul`
 `;
 
 const MemoryAidCard = styled.div<{ $color: string }>`
-  background: linear-gradient(
-    135deg,
-    ${(props) => props.$color}15 0%,
-    ${(props) => props.$color}05 100%
-  );
+  background: ${(props) => props.$color}10;
   border-left: 4px solid ${(props) => props.$color};
   padding: ${(props) => props.theme.spacing.lg};
   border-radius: ${(props) => props.theme.borderRadius.md};

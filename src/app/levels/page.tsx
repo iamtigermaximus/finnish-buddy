@@ -247,6 +247,7 @@ function LevelsContent() {
 
   const [levels, setLevels] = useState<Level[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState<string | null>(null);
   const [expandedLevel, setExpandedLevel] = useState<string | null>(
     selectedLevel,
   );
@@ -273,12 +274,17 @@ function LevelsContent() {
         const data = await response.json();
 
         if (isMounted) {
-          setLevels(data);
+          if (!response.ok || !Array.isArray(data)) {
+            setFetchError(data.error || "Failed to load your learning data. Please try again later.");
+          } else {
+            setLevels(data);
+          }
           setLoading(false);
         }
-      } catch (error) {
-        console.error("Failed to fetch levels:", error);
+      } catch (err) {
+        console.error("Failed to fetch levels:", err);
         if (isMounted) {
+          setFetchError("Could not connect to the server. Please check your connection and try again.");
           setLoading(false);
         }
       }
@@ -307,7 +313,9 @@ function LevelsContent() {
         const data = await response.json();
 
         if (isMounted) {
-          setLevels(data);
+          if (response.ok && Array.isArray(data)) {
+            setLevels(data);
+          }
         }
       } catch (error) {
         console.error("Failed to refresh levels:", error);
@@ -374,6 +382,22 @@ function LevelsContent() {
   if (loading) {
     return (
       <LoadingSpinner fullScreen message="Loading your learning path... 🐻" />
+    );
+  }
+
+  if (fetchError) {
+    return (
+      <Container>
+        <PageHeader>
+          <PageTitle>📚 Something went wrong</PageTitle>
+          <PageDescription>{fetchError}</PageDescription>
+          <div style={{ marginTop: "1.5rem" }}>
+            <Button onClick={() => window.location.reload()}>
+              Try Again 🐻
+            </Button>
+          </div>
+        </PageHeader>
+      </Container>
     );
   }
 

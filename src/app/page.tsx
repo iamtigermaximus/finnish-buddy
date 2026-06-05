@@ -9,7 +9,7 @@ import Card from "@/components/ui/Card";
 import { useSession } from "next-auth/react";
 
 const HeroSection = styled.section`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 4rem 0;
   text-align: center;
@@ -127,7 +127,7 @@ const LevelCardWrapper = styled(Card)<{ $color: string }>`
 `;
 
 const CTASection = styled.section`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 4rem 0;
   text-align: center;

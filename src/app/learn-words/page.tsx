@@ -151,7 +151,7 @@ const SituationsGrid = styled.div`
 `;
 
 const OtsoMessage = styled.div`
-  background: linear-gradient(135deg, #8b6914 0%, #a0822a 100%);
+  background: #8B6914;
   border-radius: 16px;
   padding: 1.25rem;
   margin: 1rem 1rem 2rem;

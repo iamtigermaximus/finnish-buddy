@@ -108,6 +108,7 @@ export default function DashboardPage() {
   const { user } = useAuth();
   const [levels, setLevels] = useState<LevelData[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [overallProgress, setOverallProgress] = useState(0);
 
   useEffect(() => {
@@ -115,6 +116,12 @@ export default function DashboardPage() {
       try {
         const response = await fetch("/api/levels");
         const data = await response.json();
+
+        if (!response.ok || !Array.isArray(data)) {
+          setError(data.error || "Failed to load your learning data. Please try again later.");
+          return;
+        }
+
         setLevels(data);
 
         const totalProgress = data.reduce(
@@ -124,8 +131,9 @@ export default function DashboardPage() {
         const avgProgress =
           data.length > 0 ? Math.round(totalProgress / data.length) : 0;
         setOverallProgress(avgProgress);
-      } catch (error) {
-        console.error("Failed to fetch levels:", error);
+      } catch (err) {
+        console.error("Failed to fetch levels:", err);
+        setError("Could not connect to the server. Please check your connection and try again.");
       } finally {
         setLoading(false);
       }
@@ -143,6 +151,25 @@ export default function DashboardPage() {
       <MainLayout>
         <LoadingSpinner fullScreen message="Loading your progress... 🐻" />
       </MainLayout>
+    );
+  }
+
+  if (error) {
+    return (
+      <AuthGuard>
+        <MainLayout>
+          <Container>
+            <WelcomeCard variant="bear">
+              <div className="bear">🐻</div>
+              <h1>Hei, {user?.name || "Friend"}! 👋</h1>
+              <p>{error}</p>
+              <Button onClick={() => window.location.reload()} size="large">
+                Try Again 🐻
+              </Button>
+            </WelcomeCard>
+          </Container>
+        </MainLayout>
+      </AuthGuard>
     );
   }
 

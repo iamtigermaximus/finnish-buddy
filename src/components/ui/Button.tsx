@@ -46,7 +46,7 @@ const StyledButton = styled.button<{
   ${(props) =>
     props.$variant === "primary" &&
     `
-    background: linear-gradient(135deg, ${props.theme.colors.primary} 0%, ${props.theme.colors.secondary} 100%);
+    background: ${props.theme.colors.primary};
     color: white;
     border: none;
     
@@ -85,7 +85,7 @@ const StyledButton = styled.button<{
   ${(props) =>
     props.$variant === "bear" &&
     `
-    background: linear-gradient(135deg, #8B6914 0%, #A0822A 100%);
+    background: #8B6914;
     color: white;
     border: none;
     

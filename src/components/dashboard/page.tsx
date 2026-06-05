@@ -12,11 +12,7 @@ const Container = styled.div`
 `;
 
 const Header = styled.header`
-  background: linear-gradient(
-    135deg,
-    ${(props) => props.theme.colors.primary} 0%,
-    ${(props) => props.theme.colors.secondary} 100%
-  );
+  background: ${(props) => props.theme.colors.primary};
   color: white;
   padding: ${(props) => props.theme.spacing.xl};
   text-align: center;

@@ -15,7 +15,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   padding: 1rem;
 `;
 
@@ -94,7 +94,7 @@ const ErrorMessage = styled.span`
 `;
 
 const SubmitButton = styled.button`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 0.75rem;
   border: none;

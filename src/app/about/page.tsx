@@ -56,7 +56,7 @@ const SectionText = styled.p`
 `;
 
 const OtsoCard = styled.div`
-  background: linear-gradient(135deg, #8b6914 0%, #a0822a 100%);
+  background: #8B6914;
   border-radius: 20px;
   padding: 2rem;
   margin-bottom: 2rem;

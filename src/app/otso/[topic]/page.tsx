@@ -25,7 +25,7 @@ const BackLink = styled(Link)`
 `;
 
 const OtsoHeader = styled.div`
-  background: linear-gradient(135deg, #8b6914 0%, #a0822a 100%);
+  background: #8B6914;
   border-radius: 20px;
   padding: 1.5rem;
   margin-bottom: 2rem;

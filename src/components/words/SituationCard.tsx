@@ -63,7 +63,7 @@ export interface Word {
 }
 
 const Card = styled.div`
-  background: linear-gradient(135deg, #fff 0%, #f8f9fa 100%);
+  background: #fff;
   border-radius: 20px;
   padding: 1.25rem;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);

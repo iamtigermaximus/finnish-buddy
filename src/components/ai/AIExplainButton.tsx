@@ -9,7 +9,7 @@ const Container = styled.div`
 `;
 
 const AskButton = styled.button`
-  background: linear-gradient(135deg, #8b6914 0%, #a0822a 100%);
+  background: #8B6914;
   color: white;
   border: none;
   padding: 0.5rem 1rem;
@@ -80,7 +80,7 @@ const CancelButton = styled.button`
 `;
 
 const ExplanationBox = styled.div`
-  background: linear-gradient(135deg, #fff9e6 0%, #fff3d4 100%);
+  background: #fff9e6;
   border-left: 4px solid #8b6914;
   padding: 1rem;
   margin-top: 1rem;

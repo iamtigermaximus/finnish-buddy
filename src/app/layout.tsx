@@ -37,15 +37,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <ErrorBoundary>
-          <StyledComponentsRegistry>
-            <ThemeProvider>
+        <StyledComponentsRegistry>
+          <ThemeProvider>
+            <ErrorBoundary>
               <Providers>
                 <ToastProvider>{children}</ToastProvider>
               </Providers>
-            </ThemeProvider>
-          </StyledComponentsRegistry>
-        </ErrorBoundary>
+            </ErrorBoundary>
+          </ThemeProvider>
+        </StyledComponentsRegistry>
       </body>
     </html>
   );

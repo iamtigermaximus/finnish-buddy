@@ -156,7 +156,7 @@ const LoginButton = styled(Link)`
 `;
 
 const SignupButton = styled(Link)`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 0.5rem 1.5rem;
   border-radius: 8px;

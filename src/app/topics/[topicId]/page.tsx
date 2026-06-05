@@ -10,7 +10,7 @@ import Button from "@/components/ui/Button";
 import LoadingSpinner from "@/components/ui/LoadingSpinner";
 
 const TopicHeader = styled.div`
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  background: #667eea;
   color: white;
   padding: 2rem;
   border-radius: 16px;
