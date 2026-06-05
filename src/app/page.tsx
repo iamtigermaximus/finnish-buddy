@@ -9,8 +9,8 @@ import Card from "@/components/ui/Card";
 import { useSession } from "next-auth/react";
 
 const HeroSection = styled.section`
-  background: #667eea;
-  color: white;
+  background: #f5f7fa;
+  color: #1a1a2e;
   padding: 4rem 0;
   text-align: center;
 `;
@@ -127,8 +127,8 @@ const LevelCardWrapper = styled(Card)<{ $color: string }>`
 `;
 
 const CTASection = styled.section`
-  background: #667eea;
-  color: white;
+  background: #f5f7fa;
+  color: #1a1a2e;
   padding: 4rem 0;
   text-align: center;
 `;

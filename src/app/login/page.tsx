@@ -15,7 +15,7 @@ const Container = styled.div`
   display: flex;
   align-items: center;
   justify-content: center;
-  background: #667eea;
+  background: #f5f7fa;
   padding: 1rem;
 `;
 
@@ -94,7 +94,7 @@ const ErrorMessage = styled.span`
 `;
 
 const SubmitButton = styled.button`
-  background: #667eea;
+  background: #f5f7fa;
   color: white;
   padding: 0.75rem;
   border: none;
